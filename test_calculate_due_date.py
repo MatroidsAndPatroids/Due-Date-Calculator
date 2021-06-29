@@ -49,9 +49,9 @@ class TestDueDateCalculator(unittest.TestCase):
             resolved: the solution date/time to the initial submit-turnaround pair"""
         
         for n in range(Days.week):
-            day, _ = Seconds.dayTime(submit)
-            with self.subTest(day=day):
-                if Days.isWeekend(day):
+            dayOfSubmit, _ = Seconds.dayTime(submit)
+            with self.subTest(dayOfSubmit=dayOfSubmit):
+                if Days.isWeekend(dayOfSubmit):
                     self.assertRaises(ValueError, CalculateDueDate, submit, turnaround)
                 else:
                     self.assertEqual(CalculateDueDate(submit, turnaround), resolved)
