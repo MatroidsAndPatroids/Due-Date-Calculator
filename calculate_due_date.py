@@ -2,7 +2,7 @@
 
 Time format is Unix time stored as integer 
 (eg. time 0 = January 1, 1970 Thursday 00:00:00 in the morning)
-Days of week are: 0 = Thursday, 1 = Friday, ..., 6 = Wednesday
+Days of week are: 0 = Monday, 1 = Tuesday, ..., 6 = Sunday
 Integer dates can be manipulated (shifted) by simple integer addition/subtraction.
 The Days and Seconds classes provide some useful constants for this.
 
@@ -15,14 +15,13 @@ class Days:
     
     # International constants
     week = 7
-    weekendStart = 2 # Saturday, inclusive
-    weekendEnd = 4 # Monday, exclusive
-    weekendLength = weekendEnd - weekendStart
+    weekendStart = 5 # Saturday, inclusive
+    weekendLength = 2
     workLength = week - weekendLength
     
     # True, if dayOfWeek = 0, 1, ..., 6 is marked as weekend
     def isWeekend(dayOfWeek):
-        return Days.weekendStart <= dayOfWeek < Days.weekendEnd
+        return Days.weekendStart <= dayOfWeek
 
 
 class Seconds:
@@ -32,7 +31,9 @@ class Seconds:
     min = 60
     hour = 60 * min
     day = 24 * hour
+    thursday = 3 * day
     week = 7 * day
+    weekendLength = Days.weekendLength * day
    
     # Working hour boundaries
     workStart = 9 * hour # 9AM, inclusive
@@ -41,7 +42,8 @@ class Seconds:
     
     # Current day of the week and the seconds passed since current morning 00:00
     def dayTime(datetime):
-        weekSeconds = datetime % Seconds.week
+        # Shift datetime, so Monday becomes 0 instead of Thursday
+        weekSeconds = (datetime + Seconds.thursday) % Seconds.week
         dayOfWeek, timeOfDay = divmod(weekSeconds, Seconds.day)
         return dayOfWeek, timeOfDay
     
@@ -77,7 +79,7 @@ def CalculateDueDate(submit_datetime, turnaround_time):
         raise ValueError('Submit date/time outside of working hours')
     
     # Shift submit date/time to Monday and adjust turnaround time accordingly
-    delta = (dayOfWeek - Days.weekendEnd) % Days.week
+    delta = dayOfWeek
     submit_datetime -= delta * Seconds.day
     turnaround_time += delta * Seconds.workLength
     
